@@ -1,5 +1,5 @@
 function isMatch(node) {
-  if(node.matches("div.alt2, div.postcontent, p.message")) return true;
+  if(node.matches("div.alt2, div.postcontent, p.message, div.entry-content, div.boxbody")) return true;
   return false;
 }
 
