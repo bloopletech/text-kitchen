@@ -1,14 +1,16 @@
 function compileMatchSelector() {
   var selectors = [];
   
-  selectors.push("textarea");
+  selectors.push("textarea"); //Form textearas
   selectors.push("div.alt2"); //Contents of spoiler sections on some vBulletin forum posts
   selectors.push("div.postcontent"); //vBulletin forum posts
   selectors.push("p.message"); //kusaba-based imageboard posts
-  selectors.push("div.entry-content"); //?
+  selectors.push("div.entry-content"); //blogspot.com blog posts
   selectors.push("div.boxbody"); //?
-  selectors.push("div.entry-inner"); //Some wordpress blogs
+  selectors.push("div.entry-inner"); //Some wordpress blog posts
   selectors.push("div#selectable"); //pastebin.com content
+  selectors.push("div.usertext-body"); //reddit.com posts
+  selectors.push("blockquote.postMessage"); //futaba-based imageboard posts
 
   return selectors.join(", ");
 }
@@ -20,7 +22,7 @@ var notificationStyles = `
   position: fixed;
   top: 20px;
   right: 20px;
-  z-index: 9999999;
+  z-index: 10000001;
   padding: 15px;
   border: 1px solid #d6e9c6;
   border-radius: 4px;
@@ -59,7 +61,7 @@ document.body.addEventListener("click", function(event) {
   if(!matched) return;
 
   var range = document.createRange();
-  range.selectNode(target);
+  range.selectNodeContents(target);
 
   var selection = window.getSelection();
   selection.removeAllRanges();
