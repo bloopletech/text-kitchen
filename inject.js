@@ -11,33 +11,57 @@ function compileMatchSelector() {
   selectors.push("div#selectable"); //pastebin.com content
   selectors.push("div.usertext-body"); //reddit.com posts
   selectors.push("blockquote.postMessage"); //futaba-based imageboard posts
+  selectors.push("div.grf-indent"); //Deviant Art text posts
 
   return selectors.join(", ");
 }
 
 var matchSelector = compileMatchSelector();
+var fallbackMatchSelector = "div, pre, blockquote";
 
-var notificationStyles = `
+function findElement(element, selector) {
+  while(element && element != document) {
+    if(element.matches(selector)) return element;
+    element = element.parentNode;
+  }
+
+  return null;
+}
+
+var alertStyles = `
   box-sixing: border-box;
   position: fixed;
   top: 20px;
   right: 20px;
   z-index: 10000001;
   padding: 15px;
-  border: 1px solid #d6e9c6;
+  border-width: 1px;
+  border-style: solid;
   border-radius: 4px;
-  color: #3c763d;
-  background-color: #dff0d8;
   font-weight: normal;
   font-size: 14px;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  box-shadow: 4px 4px 6px 0px rgba(0,0,0,0.4);
 `;
 
-var notificationElement = `<div style="${notificationStyles.replace(/\s+/g, " ")}">Selection copied ✓</div>`;
+var successAlertStyles = `
+  border-color: #d6e9c6;
+  color: #3c763d;
+  background-color: #dff0d8;
+`;
 
-function notifyUser() {
+var errorAlertStyles = `
+  border-color: #ebccd1;
+  color: #a94442;
+  background-color: #f2dede;
+`;
+
+var successAlertElement = `<div style="${(alertStyles + successAlertStyles).replace(/\s+/g, " ")}">Selection copied ✓</div>`;
+var errorAlertElement = `<div style="${(alertStyles + errorAlertStyles).replace(/\s+/g, " ")}">Could not find selection to copy</div>`;
+
+function alertUser(content) {
   var alert = document.createElement("div");
-  alert.innerHTML = notificationElement;
+  alert.innerHTML = content;
   document.body.appendChild(alert);
 
   setTimeout(function() {
@@ -48,20 +72,14 @@ function notifyUser() {
 document.body.addEventListener("click", function(event) {
   if(!event.altKey) return;
 
-  var target = event.target;
-  var matched = false;
-  while(target) {
-    if(target.matches(matchSelector)) {
-      matched = true;
-      break;
-    }
-    target = target.parentNode;
+  var match = findElement(event.target, matchSelector) || findElement(event.target, fallbackMatchSelector);
+  if(!match) {
+    alertUser(errorAlertElement);
+    return;
   }
 
-  if(!matched) return;
-
   var range = document.createRange();
-  range.selectNodeContents(target);
+  range.selectNodeContents(match);
 
   var selection = window.getSelection();
   selection.removeAllRanges();
@@ -71,5 +89,5 @@ document.body.addEventListener("click", function(event) {
 
   selection.removeAllRanges();
 
-  notifyUser();
+  alertUser(successAlertElement);
 });
