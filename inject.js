@@ -1,6 +1,6 @@
 function compileMatchSelector() {
   var selectors = [];
-  
+
   selectors.push("textarea"); //Form textearas
   selectors.push("div.alt2"); //Contents of spoiler sections on some vBulletin forum posts
   selectors.push("div.postcontent"); //vBulletin forum posts
@@ -12,6 +12,7 @@ function compileMatchSelector() {
   selectors.push("div.usertext-body"); //reddit.com posts
   selectors.push("blockquote.postMessage"); //futaba-based imageboard posts
   selectors.push("div.grf-indent"); //Deviant Art text posts
+  selectors.push("div.story-contents"); //Certain author site
 
   return selectors.join(", ");
 }
