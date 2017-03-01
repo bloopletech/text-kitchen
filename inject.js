@@ -9,6 +9,22 @@ function parseHeading(text, container) {
 
 function parseParagraph(text, container) {
   var paragraph = document.createElement("p");
+
+  //Convert carriage return to newline so it will get collapsed in later steps
+  text = text.replace(/\r\n/g, "\n");
+
+  //Replace runs of spaces with a single space; also converts all types of space and newlines to ASCII space
+  text = text.replace(/[ \r\n\f\t\v\u00a0\u1680\u180e\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]+/gm, " ");
+
+  //Remove leading spaces
+  text = text.replace(/^ +/gm, "");
+
+  //Remove trailing spaces
+  text = text.replace(/ +$/gm, "");
+
+  //Remove non-empty blank lines
+  text = text.replace(/^ +$/gm, "");
+
   paragraph.textContent = text;
 
   container.appendChild(paragraph);
