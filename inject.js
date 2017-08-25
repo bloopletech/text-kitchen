@@ -57,8 +57,16 @@ var errorAlertStyles = `
   background-color: #f2dede;
 `;
 
+var textareaStyles = `
+  position: absolute;
+  left: -9999px;
+  top: -9999px;
+  width: 100px;
+  height: 100px;
+`;
+
 var successAlertElement = `<div style="${(alertStyles + successAlertStyles).replace(/\s+/g, " ")}">Selection copied ✓</div>`;
-var errorAlertElement = `<div style="${(alertStyles + errorAlertStyles).replace(/\s+/g, " ")}">Could not find selection to copy</div>`;
+var errorAlertElement = `<div style="${(alertStyles + errorAlertStyles)}">Could not find selection to copy</div>`;
 
 function alertUser(content) {
   var alert = document.createElement("div");
@@ -70,6 +78,19 @@ function alertUser(content) {
   }, 4000);
 }
 
+function selectCopy(text) {
+  var textarea = document.createElement("textarea");
+  textarea.style.cssText = textareaStyles.replace(/\s+/g, " ");
+  textarea.textContent = text;
+
+  document.body.appendChild(textarea);
+
+  textarea.select();
+  document.execCommand("copy");
+
+  textarea.remove();
+}
+
 document.body.addEventListener("click", function(event) {
   if(!event.altKey) return;
 
@@ -79,16 +100,7 @@ document.body.addEventListener("click", function(event) {
     return;
   }
 
-  var range = document.createRange();
-  range.selectNodeContents(match);
-
-  var selection = window.getSelection();
-  selection.removeAllRanges();
-  selection.addRange(range);
-
-  document.execCommand("copy");
-
-  selection.removeAllRanges();
+  selectCopy(deba(match));
 
   alertUser(successAlertElement);
 });
