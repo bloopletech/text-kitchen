@@ -156,8 +156,8 @@
     return (new Stringifier(block.toArray())).stringify();
   }
 
-  function Extractor(node) {
-    this.node = node;
+  function Extractor(input) {
+    this.nodes = this.arrayify(input).map(this.convertNode);
 
     this.HEADING_TAGS = ["h1", "h2", "h3", "h4", "h5", "h6"];
     this.BLOCK_INITIATING_TAGS = ["address", "article", "aside", "body", "blockquote", "div", "dd", "dl", "dt", "figure",
@@ -176,9 +176,24 @@
 
     this.document = new Document(this);
 
-    this.process(this.node);
+    for(const node of this.nodes) {
+      this.process(node);
+      this.document.break(Paragraph);
+    }
 
     return this.document.getContent().trim();
+  }
+
+  Extractor.prototype.arrayify = function(input) {
+    if(Array.isArray(input)) return input;
+    else return [input];
+  }
+
+  Extractor.prototype.convertNode = function(input) {
+    if(input instanceof HTMLElement) return input;
+    else if(input instanceof Document) return input.documentElement;
+    else if(input instanceof Window) return input.document.documentElement;
+    else throw "input passed to Extractor not of valid type; must be an instance of HTMLElement, Document, or Window.";
   }
 
   Extractor.prototype.process = function(node) {
@@ -291,7 +306,7 @@
     return this.inBlockquote;
   }
 
-  window.deba = function(node) {
-    return (new Extractor(node)).extract();
+  window.deba = function(input) {
+    return (new Extractor(input)).extract();
   };
 })(window);

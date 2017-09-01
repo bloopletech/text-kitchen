@@ -13,7 +13,10 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["deba.js", "inject.js"]
+      "js": ["FileSaver.js", "deba.js", "inject.js"]
     }
+  ],
+  "web_accessible_resources": [
+    "matchers.json"
   ]
 }

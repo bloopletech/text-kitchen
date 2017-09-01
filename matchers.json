@@ -1,0 +1,7 @@
+[
+  {
+    "finder": "body.deviantart",
+    "selectors": [".gr > .metadata", ".gr-body > .gr > .grf-indent"],
+    "title": ".gr > .metadata h2"
+  }
+]
