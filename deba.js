@@ -60,6 +60,14 @@
     return this.text;
   }
 
+  function FixedSpan(text) {
+    this.text = text;
+  }
+
+  FixedSpan.prototype.toString = function() {
+    return this.text;
+  }
+
   function Heading(segments, level) {
     this.segments = segments;
     this.level = level;
@@ -142,7 +150,9 @@
   }
 
   Document.prototype.isPresent = function() {
-    for(const segment of this.segments) if((segment instanceof Span) && Utils.isPresent(segment.toString())) return true;
+    for(const segment of this.segments) {
+      if((segment instanceof Span || segment instanceof FixedSpan) && Utils.isPresent(segment.toString())) return true;
+    }
     return false;
   }
 
@@ -176,7 +186,11 @@
 
     this.document = new Document(this);
 
-    for(const node of this.nodes) this.process(node);
+    for(const node of this.nodes) {
+      this.document.break(Paragraph);
+      this.process(node);
+      this.document.break(Paragraph);
+    }
 
     return this.document.getContent().trim();
   }
@@ -269,6 +283,14 @@
     if(nodeName == "dd") {
       this.document.break(DefinitionDescription, node.nextElementSibling == null);
       this.processChildren(node);
+      this.document.break(Paragraph);
+
+      return;
+    }
+
+    if(nodeName == "textarea") {
+      this.document.break(Paragraph);
+      if(Utils.isPresent(node.value)) this.document.push(new FixedSpan(node.value));
       this.document.break(Paragraph);
 
       return;
