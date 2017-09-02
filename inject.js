@@ -19,23 +19,26 @@ function ensureMatchers(callback) {
 }
 
 function matcherFor(element) {
-  while(element && element != document) {
-    for(const matcher of matchers) {
-      if(element.matches(matcher.finder)) return matcher;
-    }
-
-    element = element.parentNode;
+  for(const matcher of matchers) {
+    var matchedElement = element.closest(matcher.finder);
+    if(matchedElement) return [matchedElement, matcher];
   }
-
-  return null;
 }
 
-function executeMatcher(matcher) {
-  var nodes = matcher.selectors.map(function(selector) {
-    return document.querySelector(selector);
-  });
+function executeMatcher([element, matcher]) {
+  var nodes = [];
+  for(const s of matcher.selectors) {
+    if(s == ":root") nodes.push(element);
+    else nodes = nodes.concat(Array.from(element.querySelectorAll(s)));
+  }
 
-  var title = document.querySelector(matcher.title).innerText;
+  var title = "";
+  if(matcher.pageTitle) title = document.title;
+  else {
+    var titles = [];
+    for(const e of element.querySelectorAll(matcher.title)) titles.push(e.innerText);
+    title = titles.join(" ");
+  }
 
   return {
     text: deba(nodes),
