@@ -2,7 +2,7 @@
   "name": "deba",
   "version": "0.1.0",
   "description": "Deba takes a HTML document or fragment and extracts the textual content into a plaintext format that is easy for humans to read.",
-  "main": "index.js",
+  "main": "deba.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/bloopletech/deba.js/issues"
   },
-  "homepage": "https://github.com/bloopletech/deba.js#readme"
+  "homepage": "https://github.com/bloopletech/deba.js#readme",
+  "dependencies": {
+    "jsdom": "^11.2.0"
+  }
 }

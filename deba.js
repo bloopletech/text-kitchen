@@ -1,4 +1,4 @@
-(function(window) {
+exports.deba = (function() {
   "use strict";
 
   const Utils = {
@@ -201,9 +201,10 @@
   }
 
   Extractor.prototype.convertNode = function(input) {
-    if(input instanceof HTMLElement) return input;
-    else if(input instanceof Document) return input.documentElement;
-    else if(input instanceof Window) return input.document.documentElement;
+    var type = input.constructor.name;
+    if(type == "HTMLElement") return input;
+    else if(type == "Document") return input.documentElement;
+    else if(type == "Window") return input.document.documentElement;
     else throw "input passed to Extractor not of valid type; must be an instance of HTMLElement, Document, or Window.";
   }
 
@@ -231,7 +232,7 @@
       this.document.push("\n");
     }
 
-    if(node.nodeType == Node.TEXT_NODE) {
+    if(node.nodeType == 3) {
       if(Utils.isPresent(node.textContent)) this.document.push(new Span(node.textContent));
 
       return;
@@ -325,7 +326,7 @@
     return this.inBlockquote;
   }
 
-  window.deba = function(input) {
+  return function(input) {
     return (new Extractor(input)).extract();
   };
-})(window);
+})();
