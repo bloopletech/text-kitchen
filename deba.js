@@ -1,4 +1,4 @@
-exports.deba = (function() {
+var deba = (function() {
   "use strict";
 
   const Utils = {
@@ -166,8 +166,9 @@ exports.deba = (function() {
     return (new Stringifier(block.toArray())).stringify();
   }
 
-  function Extractor(input) {
+  function Extractor(input, options) {
     this.nodes = this.arrayify(input).map(this.convertNode);
+    this.options = options || {};
 
     this.HEADING_TAGS = ["h1", "h2", "h3", "h4", "h5", "h6"];
     this.BLOCK_INITIATING_TAGS = ["address", "article", "aside", "body", "blockquote", "div", "dd", "dl", "dt", "figure",
@@ -213,6 +214,12 @@ exports.deba = (function() {
 
     if(this.SKIP_TAGS.includes(nodeName)) return;
 
+    if(this.options.exclude) {
+      for(const selector of this.options.exclude) {
+        if(node.matches(selector)) return;
+      }
+    }
+
     //Handle repeated brs by making a paragraph break
     if(nodeName == "br") {
       if(this.justAppendedBr) {
@@ -242,6 +249,14 @@ exports.deba = (function() {
       this.document.push(new Span(this.ENHANCERS[nodeName]));
       this.processChildren(node);
       this.document.push(new Span(this.ENHANCERS[nodeName]));
+
+      return;
+    }
+
+    if(this.options.images && nodeName == "img") {
+      this.document.break(Paragraph);
+      this.document.push(new Span(node.src));
+      this.document.break(Paragraph);
 
       return;
     }
@@ -326,7 +341,9 @@ exports.deba = (function() {
     return this.inBlockquote;
   }
 
-  return function(input) {
-    return (new Extractor(input)).extract();
+  return function(input, options) {
+    return (new Extractor(input, options)).extract();
   };
 })();
+
+if(typeof module === "object" && typeof module.exports === "object") module.exports = deba;

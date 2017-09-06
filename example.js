@@ -4,6 +4,6 @@ const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 
 JSDOM.fromFile(process.argv[2]).then(dom => {
-  console.log(deba.deba(dom.window.document));
+  console.log(deba(dom.window.document));
 });
 
