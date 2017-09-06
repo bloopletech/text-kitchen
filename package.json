@@ -18,5 +18,8 @@
   "homepage": "https://github.com/bloopletech/deba.js#readme",
   "dependencies": {
     "jsdom": "^11.2.0"
+  },
+  "bin": {
+    "deba": "cli.js"
   }
 }
