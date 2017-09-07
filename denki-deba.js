@@ -1,6 +1,6 @@
-var denkiDeba = (function() {
-  let deba = (typeof require === 'function') ? require('deba') : deba;
+var deba = (typeof require === 'function') ? require('deba') : deba;
 
+var denkiDeba = (function() {
   var matchers = [
     {
       "finder": "#super_frame > #monster_frame > #content_frame",
@@ -59,9 +59,9 @@ var denkiDeba = (function() {
     }
   ];
 
-  function matcherFor(document) {
+  function matcherFor(element) {
     for(const matcher of matchers) {
-      const matchedElement = document.querySelector(matcher.finder);
+      const matchedElement = element.closest ? element.closest(matcher.finder) : element.querySelector(matcher.finder);
       if(matchedElement) return [matchedElement, matcher];
     }
   }
@@ -83,8 +83,8 @@ var denkiDeba = (function() {
     };
   }
 
-  return function(document) {
-    return executeMatcher(matcherFor(document));
+  return function(element) {
+    return executeMatcher(matcherFor(element));
   };
 })();
 
