@@ -13,7 +13,7 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["FileSaver.js", "deba.js", "inject.js"],
+      "js": ["FileSaver.js", "deba.js", "denki-deba.js", "inject.js"],
       "all_frames": true
     }
   ],

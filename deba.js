@@ -1,4 +1,4 @@
-(function(window) {
+var deba = (function() {
   "use strict";
 
   const Utils = {
@@ -66,6 +66,22 @@
 
   FixedSpan.prototype.toString = function() {
     return this.text;
+  }
+
+  function Pre(segments) {
+    this.segments = segments;
+  }
+
+  Pre.prototype.toArray = function() {
+    const nodes = this.segments.join("").split(/\n{2,}/g);
+
+    var result = [];
+    for(const node of nodes) {
+      const normalised = Utils.normalise(node);
+      if(Utils.isPresent(normalised)) result.push(normalised);
+    }
+
+    return result.length ? [result.join("\n\n") + "\n\n"] : [];
   }
 
   function Heading(segments, level) {
@@ -166,8 +182,9 @@
     return (new Stringifier(block.toArray())).stringify();
   }
 
-  function Extractor(input) {
+  function Extractor(input, options) {
     this.nodes = this.arrayify(input).map(this.convertNode);
+    this.options = options || {};
 
     this.HEADING_TAGS = ["h1", "h2", "h3", "h4", "h5", "h6"];
     this.BLOCK_INITIATING_TAGS = ["address", "article", "aside", "body", "blockquote", "div", "dd", "dl", "dt", "figure",
@@ -201,16 +218,22 @@
   }
 
   Extractor.prototype.convertNode = function(input) {
-    if(input instanceof HTMLElement) return input;
-    else if(input instanceof Document) return input.documentElement;
-    else if(input instanceof Window) return input.document.documentElement;
-    else throw "input passed to Extractor not of valid type; must be an instance of HTMLElement, Document, or Window.";
+    var type = input.constructor.name;
+    if(type == "Document") return input.documentElement;
+    else if(type == "Window") return input.document.documentElement;
+    else return input;
   }
 
   Extractor.prototype.process = function(node) {
     const nodeName = node.nodeName.toLowerCase();
 
     if(this.SKIP_TAGS.includes(nodeName)) return;
+
+    if(this.options.exclude) {
+      for(const selector of this.options.exclude) {
+        if(node.matches(selector)) return;
+      }
+    }
 
     //Handle repeated brs by making a paragraph break
     if(nodeName == "br") {
@@ -231,7 +254,7 @@
       this.document.push("\n");
     }
 
-    if(node.nodeType == Node.TEXT_NODE) {
+    if(node.nodeType == 3) {
       if(Utils.isPresent(node.textContent)) this.document.push(new Span(node.textContent));
 
       return;
@@ -241,6 +264,14 @@
       this.document.push(new Span(this.ENHANCERS[nodeName]));
       this.processChildren(node);
       this.document.push(new Span(this.ENHANCERS[nodeName]));
+
+      return;
+    }
+
+    if(this.options.images && nodeName == "img") {
+      this.document.break(Paragraph);
+      this.document.push(new Span(node.src));
+      this.document.break(Paragraph);
 
       return;
     }
@@ -288,9 +319,17 @@
       return;
     }
 
-    if(nodeName == "textarea") {
+    if(nodeName == "pre") {
+      this.document.break(Pre);
+      this.processChildren(node);
       this.document.break(Paragraph);
-      if(Utils.isPresent(node.value)) this.document.push(new FixedSpan(node.value));
+
+      return;
+    }
+
+    if(nodeName == "textarea") {
+      this.document.break(Pre);
+      this.document.push(new Span(node.value));
       this.document.break(Paragraph);
 
       return;
@@ -325,7 +364,9 @@
     return this.inBlockquote;
   }
 
-  window.deba = function(input) {
-    return (new Extractor(input)).extract();
+  return function(input, options) {
+    return (new Extractor(input, options)).extract();
   };
-})(window);
+})();
+
+if(typeof module === "object" && typeof module.exports === "object") module.exports = deba;
