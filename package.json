@@ -1,6 +1,6 @@
 {
   "name": "denki-deba",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A wrapper around deba that automatically extracts the main content of a page, skipping superfluous elements and content by using website-specific rules",
   "main": "denki-deba.js",
   "scripts": {
