@@ -1,6 +1,6 @@
 'use strict';
 
-const deba = require('deba');
+const denkiDeba = require('denki-deba');
 const ume = require('ume');
 const { JSDOM } = require('jsdom');
 
@@ -81,7 +81,8 @@ h6 {
 
 app.get('/', function(req, res) {
   JSDOM.fromURL(req.query.url).then(function(jsdom) {
-    res.send(wrapResponse(ume(deba(jsdom.window.document))));
+    const result = denkiDeba(jsdom.window.document);
+    res.send(wrapResponse(ume(result.text)));
   });
 })
 
