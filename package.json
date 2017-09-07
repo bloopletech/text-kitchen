@@ -1,6 +1,6 @@
 {
   "name": "blossom-server",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Combines deba and ume into a HTTP service/proxy",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/bloopletech/blossom-server#readme",
   "dependencies": {
-    "denki-deba": "^0.2.0",
+    "denki-deba": "^0.3.0",
     "express": "^4.15.4",
     "ume": "^0.2.0"
   }
