@@ -1,6 +1,6 @@
 {
   "name": "denki-deba",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A wrapper around deba that automatically extracts the main content of a page, skipping superfluous elements and content by using website-specific rules",
   "main": "denki-deba.js",
   "scripts": {
@@ -17,7 +17,10 @@
   },
   "homepage": "https://github.com/bloopletech/denki-deba.js#readme",
   "dependencies": {
-    "deba": "^0.3.0",
+    "deba": "^0.4.0",
     "jsdom": "^11.2.0"
+  },
+  "bin": {
+    "denki-deba": "cli.js"
   }
 }
