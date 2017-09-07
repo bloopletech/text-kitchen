@@ -219,10 +219,9 @@ var deba = (function() {
 
   Extractor.prototype.convertNode = function(input) {
     var type = input.constructor.name;
-    if(type == "HTMLElement") return input;
-    else if(type == "Document") return input.documentElement;
+    if(type == "Document") return input.documentElement;
     else if(type == "Window") return input.document.documentElement;
-    else throw "input passed to Extractor not of valid type; must be an instance of HTMLElement, Document, or Window.";
+    else return input;
   }
 
   Extractor.prototype.process = function(node) {
