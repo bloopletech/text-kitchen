@@ -68,6 +68,22 @@ var deba = (function() {
     return this.text;
   }
 
+  function Pre(segments) {
+    this.segments = segments;
+  }
+
+  Pre.prototype.toArray = function() {
+    const nodes = this.segments.join("").split(/\n{2,}/g);
+
+    var result = [];
+    for(const node of nodes) {
+      const normalised = Utils.normalise(node);
+      if(Utils.isPresent(normalised)) result.push(normalised);
+    }
+
+    return result.length ? [result.join("\n\n") + "\n\n"] : [];
+  }
+
   function Heading(segments, level) {
     this.segments = segments;
     this.level = level;
@@ -304,9 +320,17 @@ var deba = (function() {
       return;
     }
 
-    if(nodeName == "textarea") {
+    if(nodeName == "pre") {
+      this.document.break(Pre);
+      this.processChildren(node);
       this.document.break(Paragraph);
-      if(Utils.isPresent(node.value)) this.document.push(new FixedSpan(node.value));
+
+      return;
+    }
+
+    if(nodeName == "textarea") {
+      this.document.break(Pre);
+      this.document.push(new Span(node.value));
       this.document.break(Paragraph);
 
       return;
