@@ -1,6 +1,6 @@
 {
   "name": "ume",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Convert text from deba back into useful HTML.",
   "main": "ume.js",
   "scripts": {
