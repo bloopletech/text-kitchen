@@ -46,7 +46,7 @@ var ume = (function() {
   }
 
   return function(text) {
-    const nodes = text.split(/\n{2,}/g);
+    const nodes = text.split(/(\r?\n){2,}/g);
     var html = [];
 
     for(const node of nodes) {
