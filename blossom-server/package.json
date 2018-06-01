@@ -1,0 +1,24 @@
+{
+  "name": "blossom-server",
+  "version": "0.4.0",
+  "description": "Combines deba and ume into a HTTP service/proxy",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bloopletech/blossom-server.git"
+  },
+  "author": "Brenton \"B-Train\" Fletcher",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bloopletech/blossom-server/issues"
+  },
+  "homepage": "https://github.com/bloopletech/blossom-server#readme",
+  "dependencies": {
+    "denki-deba": "^0.3.0",
+    "express": "^4.15.4",
+    "ume": "^0.2.0"
+  }
+}
