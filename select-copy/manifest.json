@@ -1,0 +1,23 @@
+{
+  "name": "select-copy",
+  "version": "1.3.0",
+  "manifest_version": 2,
+  "description": "With a single click, automatically selects relevant text and copies it to the clipboard.",
+  "options_ui": {
+    "page": "options.html",
+    "chrome_style": true
+  },
+  "icons": {
+    "128": "icon.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["FileSaver.js", "deba.js", "denki-deba.js", "inject.js"],
+      "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [
+    "matchers.json"
+  ]
+}
