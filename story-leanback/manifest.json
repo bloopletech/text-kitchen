@@ -1,0 +1,16 @@
+{
+  "name": "story-leanback",
+  "version": "1.2.0",
+  "manifest_version": 2,
+  "description": "Reformats text files loaded into the browser to enable easier reading. Works on local files only.",
+  "icons": {
+    "128": "icon.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["file:///*.txt"],
+      "js": ["inject.js"],
+      "css": ["story.css"]
+    }
+  ]
+}
