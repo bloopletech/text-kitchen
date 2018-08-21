@@ -1,0 +1,25 @@
+{
+  "name": "setchakuzai",
+  "version": "0.1.0",
+  "description": "Combines documents in deba format into an output document containing each of the input documents as chapters",
+  "main": "setchakuzai.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/bloopletech/setchakuzai.js.git"
+  },
+  "author": "Brenton \"B-Train\" Fletcher",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bloopletech/setchakuzai.js/issues"
+  },
+  "homepage": "https://github.com/bloopletech/setchakuzai.js#readme",
+  "dependencies": {
+    "natural-orderby": "^1.0.2"
+  },
+  "bin": {
+    "setchakuzai": "cli.js"
+  }
+}
