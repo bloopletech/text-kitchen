@@ -1,7 +1,8 @@
+#!/usr/bin/env node
 'use strict';
 
 const denkiDeba = require('denki-deba');
-const ume = require('ume');
+const ume = require('ume-no-hana');
 const { JSDOM } = require('jsdom');
 
 const express = require('express');
