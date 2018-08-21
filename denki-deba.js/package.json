@@ -1,24 +1,19 @@
 {
   "name": "denki-deba",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "A wrapper around deba that automatically extracts the main content of a page, skipping superfluous elements and content by using website-specific rules",
   "main": "denki-deba.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/bloopletech/denki-deba.js.git"
-  },
+  "repository": "github:bloopletech/text-kitchen",
   "author": "Brenton \"B-Train\" Fletcher",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/bloopletech/denki-deba.js/issues"
-  },
-  "homepage": "https://github.com/bloopletech/denki-deba.js#readme",
+  "license": "MIT",
+  "bugs": "https://github.com/bloopletech/text-kitchen/issues",
+  "homepage": "https://github.com/bloopletech/text-kitchen/tree/master/denki-deba.js",
   "dependencies": {
-    "deba": "^0.5.0",
-    "jsdom": "^11.2.0"
+    "deba": "^0.5.2",
+    "jsdom": "^12.0.0"
   },
   "bin": {
     "denki-deba": "cli.js"
