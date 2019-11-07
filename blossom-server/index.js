@@ -2,11 +2,12 @@
 'use strict';
 
 const denkiDeba = require('denki-deba');
-const ume = require('ume-no-hana');
+const MarkdownIt = require('markdown-it');
 const { JSDOM } = require('jsdom');
-
 const express = require('express');
+
 const app = express();
+const mdRenderer = new MarkdownIt();
 
 function wrapResponse(response) {
   const style = `
@@ -83,7 +84,9 @@ h6 {
 app.get('/', function(req, res) {
   JSDOM.fromURL(req.query.url).then(function(jsdom) {
     const result = denkiDeba(jsdom.window.document);
-    res.send(wrapResponse(ume(result.text)));
+    const body = mdRenderer.render(result.text);
+    const html = wrapResponse(body);
+    res.send(html);
   });
 })
 
