@@ -1,7 +1,7 @@
 {
   "name": "blossom-server",
-  "version": "0.4.2",
-  "description": "Combines deba and ume into a HTTP service/proxy",
+  "version": "0.6.0",
+  "description": "Combines deba and denki-deba into a HTTP service/proxy",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -12,10 +12,10 @@
   "bugs": "https://github.com/bloopletech/text-kitchen/issues",
   "homepage": "https://github.com/bloopletech/text-kitchen/tree/master/blossom-server",
   "dependencies": {
-    "denki-deba": "^0.5.1",
+    "denki-deba": "^0.6.0",
     "express": "^4.16.3",
     "jsdom": "^12.0.0",
-    "ume-no-hana": "^0.3.1"
+    "markdown-it": "^10.0.0"
   },
   "bin": {
     "blossom-server": "index.js"
