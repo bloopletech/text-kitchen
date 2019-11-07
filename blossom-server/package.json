@@ -1,7 +1,7 @@
 {
   "name": "blossom-server",
-  "version": "0.5.0",
-  "description": "Combines deba and ume into a HTTP service/proxy",
+  "version": "0.6.0",
+  "description": "Combines deba and denki-deba into a HTTP service/proxy",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
