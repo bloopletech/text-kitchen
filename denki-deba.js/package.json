@@ -12,7 +12,7 @@
   "bugs": "https://github.com/bloopletech/text-kitchen/issues",
   "homepage": "https://github.com/bloopletech/text-kitchen/tree/master/denki-deba.js",
   "dependencies": {
-    "deba": "^0.5.2",
+    "deba": "^0.14.0",
     "jsdom": "^12.0.0"
   },
   "bin": {

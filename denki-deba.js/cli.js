@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
 var path = require('path');
-const dekiDeba = require(path.resolve(__dirname, "./denki-deba.js"));
+const denkiDeba = require("./denki-deba");
 
 const { JSDOM } = require("jsdom");
 
 function serialize(jsdom) {
-  const result = dekiDeba(jsdom.window.document);
+  const result = denkiDeba(jsdom.window.document);
   process.stdout.write(result.title + "\n\n" + result.text + "\n");
 }
 
