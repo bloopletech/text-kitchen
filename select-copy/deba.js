@@ -5,6 +5,19 @@ var deba = (function() {
     isPresent: function(text) {
       return text != "" && text.search(/^\s*$/) == -1;
     },
+    escape: function(text) {
+      /*
+      Escaping that needs to be done all the time.
+      Of the ASCII punctuation that can be escaped in Markdown, the following can be ignored:
+      '!', because it only has meaning before a '[' or after a '<', and both of those will be escaped
+      '(' and ')', because they only have meaning after ']', which will be escaped.
+      */
+      text = text.replace(/([\\`*{}[\]#+\-_>~|])/g, '\\$1');
+      //Conditional escaping for the '.' following a number that would start an ordinal list item
+      text = text.replace(/^(\s*\d+)\. /g, '$1\\. ');
+
+      return text;
+    },
     normalise: function(text) {
       return text.replace(/\s+/g, " ").trim();
     }
@@ -52,19 +65,11 @@ var deba = (function() {
     return output.join("");
   }
 
-  function Span(text) {
-    this.text = text;
+  function Span(text, useRaw) {
+    this.text = useRaw ? text : Utils.escape(text);
   }
 
   Span.prototype.toString = function() {
-    return this.text;
-  }
-
-  function FixedSpan(text) {
-    this.text = text;
-  }
-
-  FixedSpan.prototype.toString = function() {
     return this.text;
   }
 
@@ -167,7 +172,7 @@ var deba = (function() {
 
   Document.prototype.isPresent = function() {
     for(const segment of this.segments) {
-      if((segment instanceof Span || segment instanceof FixedSpan) && Utils.isPresent(segment.toString())) return true;
+      if(segment instanceof Span && Utils.isPresent(segment.toString())) return true;
     }
     return false;
   }
@@ -184,13 +189,39 @@ var deba = (function() {
 
   function Extractor(input, options) {
     this.nodes = this.arrayify(input).map(this.convertNode);
-    this.options = options || {};
+    this.options = Object.assign({ images: true, links: true, excludeHidden: true }, options);
+
+    if(!this.nodes.length) return;
+
+    this.textProperty = ("innerText" in this.nodes[0] ? "innerText" : "textContent");
+    this.domDocument = this.nodes[0].ownerDocument;
+    this.isDomReal = !this.domDocument.hidden;
+
+    this.pageBounds = this.getPageBounds();
 
     this.HEADING_TAGS = ["h1", "h2", "h3", "h4", "h5", "h6"];
     this.BLOCK_INITIATING_TAGS = ["address", "article", "aside", "body", "blockquote", "div", "dd", "dl", "dt", "figure",
       "footer", "header", "li", "main", "nav", "ol", "p", "pre", "section", "td", "th", "ul"];
-    this.ENHANCERS = { b: "*", strong: "*", i: "_", em: "_" };
+    this.ENHANCERS = { b: "**", strong: "**", i: "*", em: "*" };
     this.SKIP_TAGS = ["head", "style", "script", "noscript"];
+    this.BREAK_TAGS_QUERY = (this.HEADING_TAGS.concat(this.BLOCK_INITIATING_TAGS)).join(", ");
+  }
+
+  Extractor.prototype.getPageBounds = function() {
+    if(!this.isDomReal || !this.options.excludeHidden) return null;
+
+    let tallestHeight = 0;
+    for(const element of this.domDocument.documentElement.querySelectorAll("*")) {
+      const elementHeight = element.scrollHeight;
+      if(elementHeight > tallestHeight) tallestHeight = elementHeight;
+    }
+
+    return {
+      top: 0,
+      right: this.domDocument.documentElement.scrollWidth,
+      bottom: tallestHeight,
+      left: 0
+    };
   }
 
   Extractor.prototype.blocks = function() {
@@ -200,6 +231,7 @@ var deba = (function() {
   Extractor.prototype.extract = function() {
     this.justAppendedBr = false;
     this.inBlockquote = false;
+    this.groupWithNext = false;
 
     this.document = new Document(this);
 
@@ -219,7 +251,7 @@ var deba = (function() {
 
   Extractor.prototype.convertNode = function(input) {
     var type = input.constructor.name;
-    if(type == "Document") return input.documentElement;
+    if(type == "Document" || type == "HTMLDocument") return input.documentElement;
     else if(type == "Window") return input.document.documentElement;
     else return input;
   }
@@ -234,6 +266,8 @@ var deba = (function() {
         if(node.matches(selector)) return;
       }
     }
+
+    if(this.options.excludeHidden && !this.isElementVisible(node)) return;
 
     //Handle repeated brs by making a paragraph break
     if(nodeName == "br") {
@@ -255,23 +289,39 @@ var deba = (function() {
     }
 
     if(node.nodeType == 3) {
-      if(Utils.isPresent(node.textContent)) this.document.push(new Span(node.textContent));
+      this.document.push(new Span(node.textContent));
 
       return;
     }
 
     if(this.ENHANCERS[nodeName]) {
-      this.document.push(new Span(this.ENHANCERS[nodeName]));
+      if(!Utils.isPresent(node[this.textProperty])) return;
+
+      var enhancer = new Span(this.ENHANCERS[nodeName], true);
+
+      this.document.push(enhancer);
       this.processChildren(node);
-      this.document.push(new Span(this.ENHANCERS[nodeName]));
+      this.document.push(enhancer);
 
       return;
     }
 
     if(this.options.images && nodeName == "img") {
-      this.document.break(Paragraph);
-      this.document.push(new Span(node.src));
-      this.document.break(Paragraph);
+      this.document.push(new Span("![" + Utils.escape(node.alt) + "](" + node.src + ")", true));
+      return;
+    }
+
+    if(this.options.links && nodeName == "a") {
+      if(!Utils.isPresent(node[this.textProperty])) return;
+
+      if(node.querySelectorAll(this.BREAK_TAGS_QUERY).length) {
+        this.processChildren(node);
+        return;
+      }
+
+      this.document.push(new Span("[", true));
+      this.processChildren(node);
+      this.document.push(new Span("](" + node.href + ")", true));
 
       return;
     }
@@ -280,8 +330,7 @@ var deba = (function() {
       this.inBlockquote = true;
 
       this.document.break(Paragraph);
-      this.processChildren(node);
-      this.document.break(Paragraph);
+      this.processFlowContent(node);
 
       this.inBlockquote = false;
 
@@ -297,25 +346,20 @@ var deba = (function() {
       }
 
       this.document.break(ListItem, node.nextElementSibling == null, index);
-      this.processChildren(node);
-      this.document.break(Paragraph);
+      this.processFlowContent(node);
 
       return;
     }
 
     if(nodeName == "dt") {
       this.document.break(DefinitionTerm);
-      this.processChildren(node);
-      this.document.break(Paragraph);
-
+      this.processFlowContent(node);
       return;
     }
 
     if(nodeName == "dd") {
       this.document.break(DefinitionDescription, node.nextElementSibling == null);
-      this.processChildren(node);
-      this.document.break(Paragraph);
-
+      this.processFlowContent(node);
       return;
     }
 
@@ -337,7 +381,8 @@ var deba = (function() {
 
     //These tags terminate the current paragraph, if present, and start a new paragraph
     if(this.BLOCK_INITIATING_TAGS.includes(nodeName)) {
-      this.document.break(Paragraph);
+      if(this.groupWithNext) this.groupWithNext = false;
+      else this.document.break(Paragraph);
       this.processChildren(node);
       this.document.break(Paragraph);
 
@@ -356,8 +401,34 @@ var deba = (function() {
     this.processChildren(node);
   }
 
+  Extractor.prototype.processFlowContent = function(node) {
+    this.groupWithNext = true;
+    this.processChildren(node);
+    this.groupWithNext = false;
+    this.document.break(Paragraph);
+  }
+
   Extractor.prototype.processChildren = function(node) {
     for(const child of node.childNodes) this.process(child);
+  }
+
+  Extractor.prototype.isElementVisible = function(node) {
+    //It's only possible to determine if an element is visible if we have access to a real browser layout engine.
+    if(!this.isDomReal) return true;
+
+    //Only elements can be hidden/visible; the concept doesn't make sense for other node types
+    if(node.nodeType != 1) return true;
+
+    //If an element doesn't have a width or a height and doesn't generate any boxes, then it's definitely hidden
+    if(!node.offsetWidth && !node.offsetHeight && !node.getClientRects().length) return false;
+
+    const window = node.ownerDocument.defaultView;
+    const styles = window.getComputedStyle(node);
+
+    const nodeBounds = node.getBoundingClientRect();
+
+    return (nodeBounds.left < this.pageBounds.right && nodeBounds.right > this.pageBounds.left &&
+      nodeBounds.top < this.pageBounds.bottom && nodeBounds.bottom > this.pageBounds.top);
   }
 
   Extractor.prototype.isInBlockquote = function() {
